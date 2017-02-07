@@ -1,8 +1,13 @@
 ---
 :backends:
+  - eyaml
   - yaml
 :hierarchy:
   - "nodes/%{::trusted.certname}"
+  - "cluster/%{::cluster}"
+  - "datacenter/%{::datacenter}"
+  - "osfamily/version/%{os.name}-%{os.release.major}"
+  - "osfamily/%{::osfamily}"
   - common
 
 :yaml:
@@ -11,3 +16,9 @@
 # - %CommonAppData%\PuppetLabs\code\environments\%{environment}\hieradata on Windows
 # When specifying a datadir, make sure the directory exists.
   :datadir:
+:eyaml:
+  :datadir:
+  :pkcs7_private_key: /etc/puppetlabs/puppet/ssl/private/private_key.pkcs7.pem
+  :pkcs7_public_key:  /etc/puppetlabs/puppet/ssl/private/public_key.pkcs7.pem
+
+:merge_behavior: deeper

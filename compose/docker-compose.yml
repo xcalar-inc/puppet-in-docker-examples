@@ -6,7 +6,7 @@ services:
     hostname: puppet
     image: puppet/puppetserver
     ports:
-      - 8140
+      - "8140:8140"
     volumes:
       - ./code:/etc/puppetlabs/code/
       - ./puppet/ssl:/etc/puppetlabs/puppet/ssl/
@@ -15,10 +15,11 @@ services:
     # added, I've seen this under Docker of Mac Beta for instance.
     # Due to needing to access PuppetDB on same hostame as signed in the
     # certificate you may need to uncommant the following lines
-    #environment:
-    #  - PUPPETDB_SERVER_URLS=https://puppetdb.local:8081
-    #links:
-    #  - puppetdb:puppetdb.local
+    environment:
+      - "PUPPETDB_SERVER_URLS=https://puppetdb.${DNSDOMAIN}:8081"
+      - "PUPPETSERVER_JAVA_ARGS=-Xms4g -Xmx12g"
+    links:
+        - "puppetdb:puppetdb.${DNSDOMAIN}"
 
   puppetdbpostgres:
     container_name: postgres
@@ -33,20 +34,34 @@ services:
 
   puppetdb:
     hostname: puppetdb
-    image: puppet/puppetdb
+    image: puppetdb
     ports:
       - 8080
       - 8081
     volumes:
       - ./puppetdb/ssl:/etc/puppetlabs/puppet/ssl/
+#    environment:
+#      - "PUPPETDB_JAVA_ARGS=-Djava.net.preferIPv4Stack=true -Xms1g -Xmx2g"
 
   puppetboard:
     image: puppet/puppetboard
     ports:
       - 8000
+    environment:
+      - "VIRTUAL_HOST=puppetboard.${DNSDOMAIN}"
 
   puppetexplorer:
     image: puppet/puppetexplorer
     ports:
       - 80
     read_only: true
+    environment:
+      - "VIRTUAL_HOST=puppetexplorer.${DNSDOMAIN}"
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro

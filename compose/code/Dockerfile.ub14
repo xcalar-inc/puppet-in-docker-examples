@@ -1,0 +1,11 @@
+FROM ubuntu:trusty
+
+RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y -qq \
+    curl
+
+RUN . /etc/os-release && REPOPKG=puppetlabs-release-pc1-trusty.deb  && \
+    curl -fsSL http://apt.puppetlabs.com/$REPOPKG > /tmp/$REPOPKG && \
+    dpkg -i /tmp/$REPOPKG && \
+    apt-get update -qq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq puppet-agent && \
+    rm -f /tmp/$REPOPKG

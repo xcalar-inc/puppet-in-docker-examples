@@ -19,7 +19,7 @@ services:
       - "PUPPETDB_SERVER_URLS=https://puppetdb.${DNSDOMAIN}:8081"
       - "PUPPETSERVER_JAVA_ARGS=-Xms4g -Xmx12g"
     links:
-        - "puppetdb:puppetdb.${DNSDOMAIN}"
+      - "puppetdb:puppetdb.${DNSDOMAIN}"
 
   puppetdbpostgres:
     container_name: postgres

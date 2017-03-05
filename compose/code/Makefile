@@ -1,5 +1,5 @@
 
-NAME=puppet-test-1
+NAME=test-puppet-1
 IMAGE=el7-systemd
 
 run:
@@ -29,3 +29,6 @@ shell:
 
 clean:
 	docker rm -fv $(NAME) || true
+
+image:
+	docker build -t $(IMAGE) .

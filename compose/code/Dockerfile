@@ -25,6 +25,10 @@ RUN yum localinstall -y https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.n
 ADD id_rsa.pub /root/.ssh/authorized_keys
 RUN chmod 0700 /root/.ssh && chmod 0600 /root/.ssh/authorized_keys && systemctl enable sshd.service
 
+ENV PATH=/opt/puppetlabs/bin:$PATH
+
+RUN for pkg in hiera-eyaml deep_merge r10k; do /opt/puppetlabs/puppet/bin/gem install --no-rdoc --no-ri ${pkg}; done
+
 EXPOSE 22
 VOLUME [ "/run", "/sys/fs/cgroup" ]
 CMD ["/usr/sbin/init"]

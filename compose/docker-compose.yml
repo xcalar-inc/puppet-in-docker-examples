@@ -29,7 +29,7 @@ services:
       - POSTGRES_PASSWORD=puppetdb
       - POSTGRES_USER=puppetdb
     expose:
-      - 5432
+      - "5432"
     volumes:
       - ./puppetdb-postgres/data:/var/lib/postgresql/data/
 
@@ -38,8 +38,8 @@ services:
     restart: unless-stopped
     build: docker/puppetdb
     ports:
-      - 8080
-      - 8081
+      - "8080"
+      - "8081"
     volumes:
       - ./puppetdb/ssl:/etc/puppetlabs/puppet/ssl/
     environment:
@@ -49,18 +49,22 @@ services:
     image: puppet/puppetboard:0.2.0
     restart: unless-stopped
     ports:
-      - 8000
+      - "8000"
     environment:
       - "VIRTUAL_HOST=puppetboard.${DNSDOMAIN}"
+      - "LETSENCRYPT_HOST=puppetboard.${DNSDOMAIN}"
+      - "LETSENCRYPT_EMAIL=abakshi@xcalar.com"
 
   puppetexplorer:
     image: puppet/puppetexplorer
     restart: unless-stopped
     ports:
-      - 80
+      - "80"
     read_only: true
     environment:
       - "VIRTUAL_HOST=puppetexplorer.${DNSDOMAIN}"
+      - "LETSENCRYPT_HOST=puppetexplorer.${DNSDOMAIN}"
+      - "LETSENCRYPT_EMAIL=${EMAIL}"
 
   nginx-proxy:
     image: jwilder/nginx-proxy
@@ -72,3 +76,14 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - /etc/nginx/certs:/etc/nginx/certs:ro
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+
+  nginx-letsencrypt-proxy:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/nginx/certs:/etc/nginx/certs:rw
+    volumes_from:
+      - nginx-proxy
